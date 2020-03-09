@@ -100,6 +100,7 @@ class MyCreatedFormListView(ListAPIView):
         tmp_profile = Profile.objects.get(user=tmp_user)
         return Form.objects.filter(author=tmp_profile).order_by('-created')
 
+
 class MyAnsweredFormListView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = FormSerializer
@@ -107,14 +108,17 @@ class MyAnsweredFormListView(ListAPIView):
     def get_queryset(self):
         tmp_user = self.request.user
         tmp_profile = Profile.objects.get(user=tmp_user)
-        return Form.objects.filter(answered_form__participant = tmp_profile)
+        return Form.objects.filter(answered_form__participant=tmp_profile)
+
 
 class FormParticipantListView(ListAPIView):
     # permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
+
     def get_queryset(self):
         formid = self.kwargs.get("formid")
-        return Profile.objects.filter(answered_form__form = formid)
+        return Profile.objects.filter(answered_form__form=formid)
+
 
 class ParticipantAnsweredFormView(ListAPIView):
     # permission_classes = [IsAuthenticated]
@@ -123,4 +127,6 @@ class ParticipantAnsweredFormView(ListAPIView):
     def get_queryset(self):
         formid = self.kwargs.get("formid")
         participant = self.kwargs.get("ppid")
-        return AnsweredForm.objects.filter(form = formid , participant = participant).order_by("-date")
+        return AnsweredForm.objects.filter(form=formid, participant=participant).order_by("-date")
+
+
