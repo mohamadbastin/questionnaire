@@ -11,6 +11,9 @@ class Profile(models.Model):
     email = models.EmailField(null=True, blank=True)
     picture = models.CharField(max_length=1000000000, null=True, blank=True)
 
+    def __str__(self):
+        return self.user.username
+
 
 class Time(models.Model):
     hour = models.TimeField()
@@ -28,23 +31,31 @@ class Form(models.Model):
     duration_days = models.IntegerField(null=True)
     is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.name + " " + str(self.author)
 
-class Request(models.Model):
+
+class FormRequest(models.Model):
     class Meta:
         unique_together = ['sender', 'form']
 
     choices = [("ACC", "accepted"), ("REJ", "rejected"), ("WIT", "waiting")]
-    sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="request")
-    form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="request")
+    sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="form_request")
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="form_request")
     status = models.CharField(max_length=128, choices=choices, default="WIT")
     is_read = models.BooleanField(default=False)
 
+    def __str__(self):
+        return str(self.sender) + " " + str(self.form)
 
 class AnsweredForm(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="answered_form")
     participant = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="answered_form")
     date = models.DateTimeField(auto_now_add=True, )
     is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.form)+ " " + str(self.participant)
 
 
 class Answer(models.Model):
@@ -61,6 +72,7 @@ class Question(models.Model):
     number = models.IntegerField(null=True)
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="Question")
     text = models.CharField(max_length=1024)
+
 
 
 class TextQuestion(Question):

@@ -124,3 +124,15 @@ class ParticipantAnsweredFormView(ListAPIView):
         formid = self.kwargs.get("formid")
         participant = self.kwargs.get("ppid")
         return AnsweredForm.objects.filter(form = formid , participant = participant).order_by("-date")
+
+class SendRequestView(CreateAPIView):
+    permission_classes =  [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        formid = self.kwargs.get("formid")
+        form = Form.objects.get(id = formid)
+        sender = self.request.user
+        sender = Profile.objects.get(user = sender )
+        FormRequest.objects.create(sender = sender , form = form)
+
+        return Response({"msg":"requested"} , status = status.HTTP_201_CREATED)
