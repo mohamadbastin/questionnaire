@@ -31,13 +31,13 @@ class RequestSerializer(serializers.ModelSerializer):
         model = FormRequest
         fields = "__all__"
 
+
 class QuestionSerializer(serializers.ModelSerializer):
     # form = FormSerializer()
 
     class Meta:
         model = Question
         fields = "__all__"
-
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -52,10 +52,10 @@ class AnsweredFormSerializer(serializers.ModelSerializer):
     # form = FormSerializer()
     # participant = ProfileSerializer()
     answer = AnswerSerializer(many=True)
+
     class Meta:
         model = AnsweredForm
-        fields = [field.name for field in model._meta.fields]+["answer"]
-
+        fields = [field.name for field in model._meta.fields] + ["answer"]
 
 
 class TextQuestionSerializer(QuestionSerializer):
