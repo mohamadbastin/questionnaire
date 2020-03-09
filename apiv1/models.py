@@ -55,7 +55,7 @@ class AnsweredForm(models.Model):
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.form)+ " " + str(self.participant)
+        return str(self.form) + " " + str(self.participant)
 
 
 class Answer(models.Model):
@@ -64,6 +64,8 @@ class Answer(models.Model):
     text = models.CharField(max_length=1024, null=True, blank=True)
     number = models.FloatField(null=True, blank=True)
 
+    def __str__(self):
+        return str(self.answered_form) + " " +  str(self.question)
 
 class Question(models.Model):
     class Meta:
@@ -73,10 +75,16 @@ class Question(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="Question")
     text = models.CharField(max_length=1024)
 
+    def __str__(self):
+        return str(self.number) + "." + self.text + str(self.form)
+
 
 
 class TextQuestion(Question):
     description = models.CharField(max_length=1024, null=True, blank=True)
+
+    def __str__(self):
+        return self.description
 
 
 class RangeQuestion(Question):
@@ -85,17 +93,28 @@ class RangeQuestion(Question):
     start_text = models.CharField(max_length=128, null=True, blank=True)
     end_text = models.CharField(max_length=128, null=True, blank=True)
 
+    def __str__(self):
+        return str(self.start) + ":" + self.start_text + "-" + str(self.end) + ":" + self.end_text
+
 
 class ChoiceQuestion(Question):
     choices = [("MA", "multiple answer"), ("SA", "single answer")]
     type = models.CharField(max_length=10, choices=choices)
+
+    def __str__(self):
+        return self.type
 
 
 class Choice(models.Model):
     question = models.ForeignKey(ChoiceQuestion, on_delete=models.CASCADE, related_name="choice")
     text = models.CharField(max_length=256)
 
+    def __str__(self):
+        return str(self.question) + self.text
 
 class AnswerChoiceRelation(models.Model):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, related_name="choice")
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE, related_name="answer")
+
+    def __str__(self):
+        return str(self.answer) + str(self.choice)
