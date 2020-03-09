@@ -23,12 +23,12 @@ class FormSerializer(serializers.ModelSerializer):
         fields = [field.name for field in model._meta.fields] + ['time']
 
 
-class Request(serializers.ModelSerializer):
+class RequestSerializer(serializers.ModelSerializer):
     form = FormSerializer()
     sender = ProfileSerializer()
 
     class Meta:
-        model = Request
+        model = FormRequest
         fields = "__all__"
 
 
