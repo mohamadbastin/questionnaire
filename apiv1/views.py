@@ -337,7 +337,7 @@ class AcceptRequestView(ListAPIView):
         return Response({"msg": "Accepted"}, status=status.HTTP_202_ACCEPTED)
 
 
-class RejectRquestView(ListAPIView):
+class RejectRequestView(ListAPIView):
     # permission_classes = [IsAuthenticated]
     serializer_class = RequestSerializer
 
