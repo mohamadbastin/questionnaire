@@ -197,3 +197,21 @@ class ChangePasswordView(ListAPIView):
         user.set_password(password)
         user.save()
         return Response({"msg":"password changed "} , status=status.HTTP_200_OK)
+
+
+class ProfileUpdateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def post(self, request, *args, **kwargs):
+        tmp_user = self.request.user
+        tmp_profile = Profile.objects.get(user=tmp_user)
+        tmp_profile.name = request.data.get("name", None)
+        tmp_profile.phone = request.data.get("phone", None)
+        tmp_profile.picture = request.data.get("picture", None)
+        tmp_profile.email= request.data.get("email", None)
+        tmp_profile.save()
+        return Response({"msg":"profile updated"} , status=status.HTTP_200_OK)
+
+
+

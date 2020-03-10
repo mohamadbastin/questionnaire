@@ -41,4 +41,5 @@ urlpatterns = [
     path('user/accepted-request/<int:req>', AcceptRequestView.as_view()) ,
     path('user/rejected-request/<int:req>' , RejectRquestView.as_view()) ,
     path('user/change-password/', ChangePasswordView.as_view()),
+    path('user/profile/update/', ProfileUpdateView.as_view())
 ]
