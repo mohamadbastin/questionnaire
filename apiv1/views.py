@@ -163,3 +163,26 @@ class OthersProfileRetrieveView(RetrieveAPIView):
         tmp_profile = Profile.objects.get(user = tmp_user)
         return tmp_profile
 
+
+
+class AcceptRequestView(ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = RequestSerializer
+
+    def get(self, request, *args, **kwargs):
+        tmp_request = self.kwargs.get("req")
+        tmp_request = FormRequest.objects.get(id = tmp_request)
+        tmp_request.status = "ACC"
+        tmp_request.save()
+        return Response({"msg":"Accepted" } , status = status.HTTP_202_ACCEPTED)
+
+
+class RejectRquestView(ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = RequestSerializer
+
+    def get(self, request, *args, **kwargs):
+        tmp_request = self.kwargs.get("req")
+        tmp_request = FormRequest.objects.get(id=tmp_request)
+        tmp_request.delete()
+        return Response({"msg":"Deleted"} , status= status.HTTP_200_OK)
