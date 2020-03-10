@@ -303,3 +303,72 @@ class FormAnswerCreate(CreateAPIView):
                     AnswerChoiceRelation.objects.create(answer=a, choice_id=int(j["id"]))
 
         return Response({"msg": "submitted"}, status=status.HTTP_200_OK)
+
+
+class ProfileRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        tmp_user = self.request.user
+        tmp_profile = Profile.objects.get(user=tmp_user)
+        return tmp_profile
+
+
+class OthersProfileRetrieveView(RetrieveAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        tmp_user = self.kwargs.get("user")
+        tmp_profile = Profile.objects.get(user=tmp_user)
+        return tmp_profile
+
+
+class AcceptRequestView(ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = RequestSerializer
+
+    def get(self, request, *args, **kwargs):
+        tmp_request = self.kwargs.get("req")
+        tmp_request = FormRequest.objects.get(id=tmp_request)
+        tmp_request.status = "ACC"
+        tmp_request.save()
+        return Response({"msg": "Accepted"}, status=status.HTTP_202_ACCEPTED)
+
+
+class RejectRquestView(ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = RequestSerializer
+
+    def get(self, request, *args, **kwargs):
+        tmp_request = self.kwargs.get("req")
+        tmp_request = FormRequest.objects.get(id=tmp_request)
+        tmp_request.delete()
+        return Response({"msg": "Deleted"}, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        password = request.data.get("password", None)
+        user.set_password(password)
+        user.save()
+        return Response({"msg": "password changed "}, status=status.HTTP_200_OK)
+
+
+class ProfileUpdateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def post(self, request, *args, **kwargs):
+        tmp_user = self.request.user
+        tmp_profile = Profile.objects.get(user=tmp_user)
+        tmp_profile.name = request.data.get("name", None)
+        tmp_profile.phone = request.data.get("phone", None)
+        tmp_profile.picture = request.data.get("picture", None)
+        tmp_profile.email = request.data.get("email", None)
+        tmp_profile.save()
+        return Response({"msg": "profile updated"}, status=status.HTTP_200_OK)

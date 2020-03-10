@@ -39,5 +39,12 @@ urlpatterns = [
     path('form/create/', FormCreateView.as_view()),
     path('form/update/<int:fid>', FormUpdateView.as_view()),
     path('form/question/create/<int:fid>', FormQuestionAddView.as_view()),
-    path('form/answer/<int:fid>', FormAnswerCreate.as_view())
+    path('form/answer/<int:fid>', FormAnswerCreate.as_view()),
+    path('form/request/<int:formid>', SendRequestView.as_view()),
+    path('user/profile/detail/', ProfileRetrieveView.as_view()),
+    path('user/profile/<int:user>', OthersProfileRetrieveView.as_view()),
+    path('user/accepted-request/<int:req>', AcceptRequestView.as_view()),
+    path('user/rejected-request/<int:req>', RejectRquestView.as_view()),
+    path('user/change-password/', ChangePasswordView.as_view()),
+    path('user/profile/update/', ProfileUpdateView.as_view())
 ]
