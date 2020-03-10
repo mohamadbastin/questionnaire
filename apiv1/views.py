@@ -1,14 +1,13 @@
-from django.shortcuts import render
-
 # Create your views here.
-from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView, RetrieveAPIView
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.core.exceptions import ValidationError
-from rest_framework import status
-from .models import *
+
 from .serializers import *
-from rest_framework.authtoken.models import Token
+
+dic = {"True": True, "true": True, True: True, "False": False, "false": False, False: False, None: False}
 
 
 class IsConnected(ListAPIView):
@@ -77,10 +76,20 @@ class FormRetrieveView(RetrieveAPIView):
 
 class FormQuestionListView(ListAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = QuestionSerializer
-    queryset = Question.objects.all().order_by('number')
-    lookup_url_kwarg = "form"
-    lookup_field = 'form'
+    allowed_methods = ["GET"]
+
+    serializer_class = MyQuestionSerializer
+
+    def get_queryset(self):
+        ls = []
+        for i in Question.objects.all():
+            if i.type == "text":
+                ls.append(TextQuestion.objects.get(id=i.id))
+            elif i.type == "range":
+                ls.append(RangeQuestion.objects.get(id=i.id))
+            elif i.type == "choice":
+                ls.append(ChoiceQuestion.objects.get(id=i.id))
+        return ls
 
 
 class CreatedFormListView(ListAPIView):
@@ -142,3 +151,155 @@ class SendRequestView(CreateAPIView):
         FormRequest.objects.create(sender=sender, form=form)
 
         return Response({"msg": "requested"}, status=status.HTTP_201_CREATED)
+
+
+class FormCreateView(CreateAPIView):
+    serializer_class = FormSerializer
+    permission_classes = [IsAuthenticated]
+
+    # post example
+    # {
+    #     "name"
+    #     "description"
+    #     "is_private"
+    #     "estimated_time"
+    #     "is_repeated"
+    #     "duration_days"
+    #     "is_active"
+    # }
+
+    def post(self, request, *args, **kwargs):
+        f = Form.objects.create(author=Profile.objects.get(user=self.request.user), name=request.data.get("name"),
+                                description=request.data.get("description"),
+                                is_active=dic[request.data.get("is_active")],
+                                is_private=dic[request.data.get("is_private")],
+                                is_repeated=dic[request.data.get("is_repeated")],
+                                estimated_time=int(request.data.get("estimated_time")))
+
+        if dic[request.data.get("is_repeated")]:
+            f.duration_days = int(request.data.get("duration_days"))
+            f.save()
+        else:
+            f.duration_days = None
+            f.save()
+
+        return Response({"form_id": f.pk}, status=status.HTTP_201_CREATED)
+
+
+class FormUpdateView(CreateAPIView):
+    serializer_class = FormSerializer
+
+    def post(self, request, *args, **kwargs):
+        fid = self.kwargs.get("fid")
+        f = Form.objects.get(id=fid)
+        f.name = request.data.get("name")
+        f.description = request.data.get("description")
+        f.is_active = dic[request.data.get("is_active")]
+        f.is_private = dic[request.data.get("is_private")]
+        f.is_repeated = dic[request.data.get("is_repeated")]
+        f.estimated_time = int(request.data.get("estimated_time"))
+
+        if dic[request.data.get("is_repeated")]:
+            f.duration_days = int(request.data.get("duration_days"))
+            f.save()
+        else:
+            f.duration_days = None
+            f.save()
+
+        f.save()
+
+        return Response({"form_id": f.pk}, status=status.HTTP_200_OK)
+
+
+class FormQuestionAddView(CreateAPIView):
+    # [
+    #     {
+    #         "type": "text"/"choice"/"range"
+    #         "text"
+    #         "number"
+    #         "description"
+    #
+    #         //"text"
+    #
+    #         //"range"
+    #         start
+    #         start text
+    #         end
+    #         end text
+    #
+    #         //choice
+    #         choice_type MA SA
+    #         choices:[
+    #              {
+    #                  text
+    #              }
+    #         ]
+    #     }
+    # ]
+    def post(self, request, *args, **kwargs):
+        fid = self.kwargs.get("fid")
+        f = Form.objects.get(id=fid)
+
+        for i in self.request.data:
+            if i["type"] == "text":
+                TextQuestion.objects.create(form=f, text=i["text"], description=i["description"],
+                                            number=int(i["number"]), type=i["type"])
+
+            elif i["type"] == 'range':
+                RangeQuestion.objects.create(form=f, text=i["text"], description=i["description"],
+                                             number=int(i["number"]), start=int(i["start"]), end=int(i["end"]),
+                                             start_text=i["start_text"], end_text=i["end_text"], type=i["type"])
+
+            elif i["type"] == "choice":
+                a = ChoiceQuestion.objects.create(form=f, choice_type=i["choice_type"], text=i["text"],
+                                                  description=i["description"],
+                                                  number=int(i["number"]), type=i["type"])
+
+                for j in i["choices"]:
+                    Choice.objects.create(question=a, text=j["text"])
+
+        return Response({"msg": "created"}, status=status.HTTP_201_CREATED)
+
+
+class FormAnswerCreate(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    # [
+    #     {
+    #         question
+    #
+    #         //text
+    #         text
+    #
+    #         //range
+    #         number
+    #
+    #         //choice
+    #         choices=[
+    #             {
+    #                 id
+    #             }
+    #         ]
+    #     }
+    # ]
+
+    def post(self, request, *args, **kwargs):
+        fid = self.kwargs.get("fid")
+        f = Form.objects.get(id=fid)
+
+        r = self.request.user
+        p = Profile.objects.get(user=r)
+
+        af = AnsweredForm.objects.create(form=f, participant=p)
+        for i in request.data:
+            q = Question.objects.get(id=int(i["question"]))
+            if q.type == "text":
+                Answer.objects.create(answered_form=af, question=q, text=i["text"])
+            elif q.type == "range":
+                Answer.objects.create(answered_form=af, question=q, number=i["number"])
+            elif q.type == "choice":
+                a = Answer.objects.create(answered_form=af, question=q)
+                for j in i["choices"]:
+                    AnswerChoiceRelation.objects.create(answer=a, choice_id=int(j["id"]))
+
+        return Response({"msg": "submitted"}, status=status.HTTP_200_OK)

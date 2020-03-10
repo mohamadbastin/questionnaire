@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import *
 
 
@@ -70,18 +71,20 @@ class RangeQuestionSerializer(QuestionSerializer):
         fields = "__all__"
 
 
-class ChoiceQuestionSerializer(QuestionSerializer):
-    class Meta:
-        model = ChoiceQuestion
-        fields = "__all__"
-
-
 class ChoiceSerializer(serializers.ModelSerializer):
-    question = ChoiceQuestionSerializer()
+    # question = ChoiceQuestionSerializer()
 
     class Meta:
         model = Choice
-        fields = "__all__"
+        fields = ["id", "text"]
+
+
+class ChoiceQuestionSerializer(QuestionSerializer):
+    choice = ChoiceSerializer(many=True)
+
+    class Meta:
+        model = ChoiceQuestion
+        fields = ["id", "number", "form", "text", "description", "type", "choice_type", "choice"]
 
 
 class AnswerChoiceRelationSerializer(serializers.ModelSerializer):
@@ -91,3 +94,17 @@ class AnswerChoiceRelationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnswerChoiceRelation
         fields = "__all__"
+
+
+class MyQuestionSerializer(serializers.Serializer):
+    question = serializers.SerializerMethodField()
+
+    def get_question(self, instance):
+        if instance.type == "text":
+            serializer = TextQuestionSerializer
+        elif instance.type == "range":
+            serializer = RangeQuestionSerializer
+        elif instance.type == "choice":
+            serializer = ChoiceQuestionSerializer
+
+        return serializer(instance).data
