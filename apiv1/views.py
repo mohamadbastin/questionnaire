@@ -186,3 +186,14 @@ class RejectRquestView(ListAPIView):
         tmp_request = FormRequest.objects.get(id=tmp_request)
         tmp_request.delete()
         return Response({"msg":"Deleted"} , status= status.HTTP_200_OK)
+
+
+class ChangePasswordView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        password = request.data.get("password", None)
+        user.set_password(password)
+        user.save()
+        return Response({"msg":"password changed "} , status=status.HTTP_200_OK)
