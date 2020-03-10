@@ -142,3 +142,24 @@ class SendRequestView(CreateAPIView):
         FormRequest.objects.create(sender=sender, form=form)
 
         return Response({"msg": "requested"}, status=status.HTTP_201_CREATED)
+
+
+class ProfileRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        tmp_user = self.request.user
+        tmp_profile = Profile.objects.get(user=tmp_user)
+        return tmp_profile
+
+
+class OthersProfileRetrieveView(RetrieveAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        tmp_user = self.kwargs.get("user")
+        tmp_profile = Profile.objects.get(user = tmp_user)
+        return tmp_profile
+
