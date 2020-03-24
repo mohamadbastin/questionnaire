@@ -4,4 +4,3 @@ myenv/
 venv
 myenv
 .idea
-db.sqlite3
