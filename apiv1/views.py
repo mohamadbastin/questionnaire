@@ -110,7 +110,7 @@ class MyCreatedFormListView(ListAPIView):
         return Form.objects.filter(author=tmp_profile).order_by('-created')
 
 
-class MyAnsweredFormListView(ListAPIView):
+class MyAnsweredFormsListView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = FormSerializer
 
@@ -121,7 +121,7 @@ class MyAnsweredFormListView(ListAPIView):
 
 
 class FormParticipantListView(ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
 
     def get_queryset(self):
@@ -130,7 +130,7 @@ class FormParticipantListView(ListAPIView):
 
 
 class ParticipantAnsweredFormView(ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = AnsweredFormSerializer
 
     def get_queryset(self):
@@ -187,6 +187,7 @@ class FormCreateView(CreateAPIView):
 
 
 class FormUpdateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = FormSerializer
 
     def post(self, request, *args, **kwargs):
@@ -212,6 +213,8 @@ class FormUpdateView(CreateAPIView):
 
 
 class FormQuestionAddView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+
     # [
     #     {
     #         "type": "text"/"choice"/"range"
@@ -356,7 +359,7 @@ class ChangePasswordView(ListAPIView):
         password = request.data.get("password", None)
         user.set_password(password)
         user.save()
-        return Response({"msg": "password changed "}, status=status.HTTP_200_OK)
+        return Response({"msg": "password changed"}, status=status.HTTP_200_OK)
 
 
 class ProfileUpdateView(CreateAPIView):
@@ -372,3 +375,152 @@ class ProfileUpdateView(CreateAPIView):
         tmp_profile.email = request.data.get("email", None)
         tmp_profile.save()
         return Response({"msg": "profile updated"}, status=status.HTTP_200_OK)
+
+
+# class FormQuestionUpdateView(CreateAPIView):
+#     permission_classes = [IsAuthenticated]
+#
+#     # [
+#     #     {
+#     #         "type": "text"/"choice"/"range"
+#     #         "text"
+#     #         "number"
+#     #         "description"
+#     #
+#     #         //"text"
+#     #
+#     #         //"range"
+#     #         start
+#     #         start text
+#     #         end
+#     #         end text
+#     #
+#     #         //choice
+#     #         choice_type MA SA
+#     #         choices:[
+#     #              {
+#     #                  text
+#     #              }
+#     #         ]
+#     #     }
+#     # ]
+#     def post(self, request, *args, **kwargs):
+#         f = self.kwargs.get("fid")
+#         f = Form.objects.get(id=f)
+#
+#         for i in self.request.data:
+#
+#             if i["type"] == "text":
+#                 try:
+#                     t = TextQuestion.objects.get(form=f, text=i["text"])
+#                     t.text = i["text"]
+#                     t.description = i["description"]
+#                     t.save()
+#                 except Question.DoesNotExist:
+#                     TextQuestion.objects.create(form=f, text=i["text"], description=i["description"],
+#                                                 number=int(i["number"]), type=i["type"])
+#
+#             elif i["type"] == 'range':
+#                 t = f.question.get(id=i["id"])
+#                 t.form = f
+#                 t.text = i["text"]
+#                 t.description = i["description"]
+#                 t.number = int(i["number"])
+#                 t.start = int(i["start"])
+#                 t.end = int(i["end"])
+#                 t.start_text = i["start_text"]
+#                 t.end_text = i["end_text"]
+#                 t.type = i["type"]
+#                 t.save()
+#
+#             elif i["type"] == "choice":
+#                 t = f.question.get(id=i["id"])
+#                 t.form = f
+#                 t.choice_type = i["choice_type"]
+#                 t.text = i["text"]
+#                 t.description = i["description"]
+#                 t.number = int(i["number"])
+#                 t.type = i["type"]
+#                 t.save()
+#
+#                 for j in i["choices"]:
+#                     b = Choice.objects.get_or_create(id=j["id"])
+#                     b.question = t
+#                     b.text = j["text"]
+
+
+class FormQuestionUpdateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        f = self.kwargs.get("fid")
+        f = Form.objects.get(id=f)
+
+        dis = len(request.data)
+        if dis == 0:
+            return Response({"msg": "0 questions"})
+
+        f.question.all().delete()
+
+        for i in self.request.data:
+            if i["type"] == "text":
+                TextQuestion.objects.create(form=f, text=i["text"], description=i["description"],
+                                            number=int(i["number"]), type=i["type"])
+
+            elif i["type"] == 'range':
+                RangeQuestion.objects.create(form=f, text=i["text"], description=i["description"],
+                                             number=int(i["number"]), start=int(i["start"]), end=int(i["end"]),
+                                             start_text=i["start_text"], end_text=i["end_text"], type=i["type"])
+
+            elif i["type"] == "choice":
+                a = ChoiceQuestion.objects.create(form=f, choice_type=i["choice_type"], text=i["text"],
+                                                  description=i["description"],
+                                                  number=int(i["number"]), type=i["type"])
+
+                for j in i["choices"]:
+                    Choice.objects.create(question=a, text=j["text"])
+
+        return Response({"msg": "updated"}, status=status.HTTP_200_OK)
+
+
+class IsFormFilledByUserView(ListAPIView):
+    serializer_class = ProfileSerializer
+
+    def get(self, request, *args, **kwargs):
+        prf = Profile.objects.get(user=self.request.user)
+        frm = Form.objects.get(id=kwargs.get('fid'))
+
+        try:
+            a = AnsweredForm.objects.get(form=frm, participant=prf)
+            return Response({"is_filled": True}, status=status.HTTP_200_OK)
+        except AnsweredForm.DoesNotExist:
+            return Response({"is_filled": False}, status=status.HTTP_404_NOT_FOUND)
+
+
+class MyAnsweredFormView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AnsweredFormSerializer
+
+    def get_queryset(self):
+        formid = self.kwargs.get("formid")
+        participant = Profile.objects.get(user=self.request.user)
+
+        return AnsweredForm.objects.filter(form=formid, participant=participant).order_by("-date")
+
+
+class Register(CreateAPIView):
+    serializer_class = ProfileSerializer
+
+    def post(self, request, *args, **kwargs):
+        phone = self.request.data.get("phone")
+        try:
+            a = User.objects.get(username=phone)
+            a.set_password("1111")
+            a.save()
+        except User.DoesNotExist:
+            a = User.objects.create_user(username=phone)
+            a.set_password("1111")
+            a.save()
+            b = Profile.objects.create(user=a)
+
+        return Response({"msg": "ok"}, status=status.HTTP_200_OK)

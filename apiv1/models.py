@@ -72,10 +72,10 @@ class Answer(models.Model):
 
 class Question(models.Model):
     class Meta:
-        unique_together = ["number", "form"]
+        unique_together = ["text", "form"]
 
     number = models.IntegerField(null=True)
-    form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="Question")
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="question")
     text = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024, null=True, blank=True)
     type = models.CharField(max_length=10, choices=[("text", "text"), ("choice", "choice"), ("range", "range")],
@@ -89,7 +89,7 @@ class TextQuestion(Question):
     # description = models.CharField(max_length=1024, null=True, blank=True)
 
     def __str__(self):
-        return self.description
+        return str(self.text)
 
 
 class RangeQuestion(Question):
