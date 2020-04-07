@@ -259,7 +259,7 @@ class FormQuestionAddView(CreateAPIView):
 
             elif i["type"] == 'range':
                 RangeQuestion.objects.create(form=f, text=i["text"], description=i["description"],
-                                             number=int(i["number"]), start=int(i["start"]), end=int(i["end"]),
+                                             number=int(i["number"]), start=1, end=10,
                                              start_text=i["start_text"], end_text=i["end_text"], type=i["type"])
 
             elif i["type"] == "choice":
