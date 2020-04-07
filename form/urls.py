@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from form import settings
+from django.conf.urls.static import static
 from django.urls import path
 from rest_framework.authtoken import views
 
@@ -53,3 +55,9 @@ urlpatterns = [
     path('form/my-answer/<int:formid>', MyAnsweredFormView.as_view()),
     path('register/', Register.as_view())
 ]
+
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
