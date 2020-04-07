@@ -16,8 +16,11 @@ class Profile(models.Model):
 
 
 class Time(models.Model):
-    hour = models.TimeField()
+    hour = models.CharField(max_length=30)
     form = models.ForeignKey('Form', on_delete=models.CASCADE, related_name='time')
+
+    def __str__(self):
+        return str(self.hour) + " " + str(self.form)
 
 
 class Form(models.Model):

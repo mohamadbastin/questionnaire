@@ -166,6 +166,7 @@ class FormCreateView(CreateAPIView):
     #     "is_repeated"
     #     "duration_days"
     #     "is_active"
+    #     "times"
     # }
 
     def post(self, request, *args, **kwargs):
@@ -182,6 +183,14 @@ class FormCreateView(CreateAPIView):
         else:
             f.duration_days = None
             f.save()
+
+        try:
+            a = request.data.get('times')
+            for i in a:
+                print('f')
+                Time.objects.create(form=f, hour=str(i))
+        except:
+            pass
 
         return Response({"form_id": f.pk}, status=status.HTTP_201_CREATED)
 
