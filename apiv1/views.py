@@ -1,4 +1,6 @@
 # Create your views here.
+from random import randint
+
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
@@ -525,16 +527,34 @@ class Register(CreateAPIView):
         name = self.request.data.get('name')
         try:
             a = User.objects.get(username=phone)
-            a.set_password("1111")
+            # a.set_password("1111")
+            # a.save()
+
+            password = randint(1000, 9999)
+
+            a.set_password(password)
             a.save()
+
+            message = Message(token=password, to=phone)
+
+            operator = Operator.objects.get(name="sahar")
+            operator.send_message(message)
+
             p = Profile.objects.get(user=a)
             if p.name == None or p.name == '':
                 p.name = name
                 p.save()
         except User.DoesNotExist:
             a = User.objects.create_user(username=phone)
-            a.set_password("1111")
+            password = randint(1000, 9999)
+
+            a.set_password(password)
             a.save()
+
+            message = Message(token=password, to=phone)
+
+            operator = Operator.objects.get(name="sahar")
+            operator.send_message(message)
             b = Profile.objects.create(user=a, name=name)
 
         return Response({"msg": "ok"}, status=status.HTTP_200_OK)
