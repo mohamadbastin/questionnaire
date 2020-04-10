@@ -1,6 +1,7 @@
 # Create your views here.
 from random import randint
 
+from kavenegar import *
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
@@ -10,6 +11,25 @@ from rest_framework.response import Response
 from .serializers import *
 
 dic = {"True": True, "true": True, True: True, "False": False, "false": False, False: False, None: False}
+
+from form.settings import SMS_API_KEY
+
+
+def send_verify(api_key, phone, token):
+    try:
+        api = KavenegarAPI(api_key)
+        string = "کد تایید شما: {}  AskFill".format(token)
+        params = {
+            'receptor': phone,
+            'message': string,
+        }
+        response = api.sms_send(params)
+        print(response)
+        Message.objects.create(to=phone, token=token, )
+    except APIException as e:
+        print(e)
+    except HTTPException as e:
+        print(e)
 
 
 class IsConnected(ListAPIView):
@@ -534,11 +554,11 @@ class Register(CreateAPIView):
 
             a.set_password(password)
             a.save()
+            send_verify(SMS_API_KEY, phone, str(password))
+            # message = Message(token=password, to=phone)
 
-            message = Message(token=password, to=phone)
-
-            operator = Operator.objects.get(name="sahar")
-            operator.send_message(message)
+            # operator = Operator.objects.get(name="sahar")
+            # operator.send_message(message)
 
             p = Profile.objects.get(user=a)
             if p.name == None or p.name == '':
@@ -551,10 +571,11 @@ class Register(CreateAPIView):
             a.set_password(password)
             a.save()
 
-            message = Message(token=password, to=phone)
-
-            operator = Operator.objects.get(name="sahar")
-            operator.send_message(message)
+            send_verify(SMS_API_KEY, phone, str(password))
+            # message = Message(token=password, to=phone)
+            #
+            # operator = Operator.objects.get(name="sahar")
+            # operator.send_message(message)
             b = Profile.objects.create(user=a, name=name)
 
         return Response({"msg": "ok"}, status=status.HTTP_200_OK)
