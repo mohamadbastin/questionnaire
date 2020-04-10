@@ -139,7 +139,50 @@ class MyAnsweredFormsListView(ListAPIView):
     def get_queryset(self):
         tmp_user = self.request.user
         tmp_profile = Profile.objects.get(user=tmp_user)
-        return Form.objects.filter(answered_form__participant=tmp_profile)
+        return Form.objects.filter(answered_form__participant=tmp_profile, is_repeated=True)
+
+
+class UserActiveFormsListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FormSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        profile = Profile.objects.get(user=user)
+        return profile.formm.filter(is_repeated=True, is_active=True)
+
+
+class Participate(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChoiceSerializer
+
+    def post(self, request, *args, **kwargs):
+        pr = Profile.objects.get(user=self.request.user)
+        frm = Form.objects.get(id=kwargs.get('fid'))
+        password = request.data.get('password', ' ')
+
+        if frm.is_private:
+            if frm.password == password:
+                frm.participant_list.add(pr)
+                frm.save()
+                return Response({"msg": "ok"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"msg": "pass wrong"}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            frm.participant_list.add(pr)
+            frm.save()
+            return Response({"msg": "ok"}, status=status.HTTP_200_OK)
+
+
+class RemovePart(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChoiceSerializer
+
+    def post(self, request, *args, **kwargs):
+        pr = Profile.objects.get(user=self.request.user)
+        frm = Form.objects.get(id=kwargs.get('fid'))
+        frm.participant_list.remove(pr)
+        frm.save()
 
 
 class FormParticipantListView(ListAPIView):

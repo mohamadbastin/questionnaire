@@ -14,13 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.contrib import admin
-from form import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 from django.urls import path
 from rest_framework.authtoken import views
 
 from apiv1.views import *
+from form import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -43,7 +43,7 @@ urlpatterns = [
     path('form/question/create/<int:fid>', FormQuestionAddView.as_view()),
     path('form/answer/<int:fid>', FormAnswerCreate.as_view()),
     path('form/request/<int:formid>', SendRequestView.as_view()),
-    path('user/profile/detail/', ProfileRetrieveView.as_view()),
+    path('profile/', ProfileRetrieveView.as_view()),
     path('user/profile/<int:user>', OthersProfileRetrieveView.as_view()),
     path('user/accepted-request/<int:req>', AcceptRequestView.as_view()),
     path('user/rejected-request/<int:req>', RejectRequestView.as_view()),
@@ -53,10 +53,9 @@ urlpatterns = [
     path('connection', IsConnected.as_view()),
     path('form/is-filled/<int:fid>', IsFormFilledByUserView.as_view()),
     path('form/my-answer/<int:formid>', MyAnsweredFormView.as_view()),
-    path('register/', Register.as_view())
+    path('register/', Register.as_view()),
+    path('participate/', Participate.as_view())
 ]
-
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

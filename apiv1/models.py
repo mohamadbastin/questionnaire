@@ -36,7 +36,9 @@ class Form(models.Model):
     estimated_time = models.IntegerField(null=True)
     is_repeated = models.BooleanField(default=False)
     duration_days = models.IntegerField(null=True)
+    password = models.CharField(max_length=256, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    participant_list = models.ManyToManyField(Profile, related_name='formm')
 
     def __str__(self):
         return str(self.name) + " " + str(self.author)
@@ -54,6 +56,7 @@ class FormRequest(models.Model):
 
     def __str__(self):
         return str(self.sender) + " " + str(self.form)
+
 
 
 class AnsweredForm(models.Model):
