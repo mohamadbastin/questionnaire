@@ -6,3 +6,4 @@ myenv
 .idea
 static
 db.sqlite3
+apiv1/migrations
