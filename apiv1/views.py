@@ -177,12 +177,12 @@ class FormCreateView(CreateAPIView):
                                 is_repeated=dic[request.data.get("is_repeated")],
                                 estimated_time=int(request.data.get("estimated_time")))
 
-        if dic[request.data.get("is_repeated")]:
-            f.duration_days = int(request.data.get("duration_days"))
-            f.save()
-        else:
-            f.duration_days = None
-            f.save()
+        # if dic[request.data.get("is_repeated")]:
+        #     f.duration_days = int(request.data.get("duration_days"))
+        #     f.save()
+        # else:
+        f.duration_days = None
+        f.save()
 
         try:
             a = request.data.get('times')
@@ -522,14 +522,19 @@ class Register(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         phone = self.request.data.get("phone")
+        name = self.request.data.get('name')
         try:
             a = User.objects.get(username=phone)
             a.set_password("1111")
             a.save()
+            p = Profile.objects.get(user=a)
+            if p.name == None or p.name == '':
+                p.name = name
+                p.save()
         except User.DoesNotExist:
             a = User.objects.create_user(username=phone)
             a.set_password("1111")
             a.save()
-            b = Profile.objects.create(user=a)
+            b = Profile.objects.create(user=a, name=name)
 
         return Response({"msg": "ok"}, status=status.HTTP_200_OK)
