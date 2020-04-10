@@ -110,7 +110,7 @@ class ChoiceQuestion(Question):
     choice_type = models.CharField(max_length=10, choices=choices)
 
     def __str__(self):
-        return self.type
+        return self.text
 
 
 class Choice(models.Model):
