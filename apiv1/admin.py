@@ -9,6 +9,8 @@ class FormAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Profile)
+admin.site.register(Message)
+admin.site.register(Operator)
 admin.site.register(FormRequest)
 admin.site.register(AnsweredForm)
 admin.site.register(Form, FormAdmin)
