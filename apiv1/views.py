@@ -593,8 +593,8 @@ class Register(CreateAPIView):
             # a.set_password("1111")
             # a.save()
 
-            password = randint(1000, 9999)
-
+            # password = randint(1000, 9999)
+            password = '1111'
             a.set_password(password)
             a.save()
             send_verify(SMS_API_KEY, phone, str(password))
@@ -609,8 +609,8 @@ class Register(CreateAPIView):
                 p.save()
         except User.DoesNotExist:
             a = User.objects.create_user(username=phone)
-            password = randint(1000, 9999)
-
+            # password = randint(1000, 9999)
+            password = '1111'
             a.set_password(password)
             a.save()
 
