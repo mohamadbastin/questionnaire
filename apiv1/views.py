@@ -138,7 +138,11 @@ class MyAnsweredFormsListView(ListAPIView):
     def get_queryset(self):
         tmp_user = self.request.user
         tmp_profile = Profile.objects.get(user=tmp_user)
-        return Form.objects.filter(participant_list__in=[tmp_profile], is_repeated=True)
+        ls = []
+        for i in Form.objects.filter(is_active=True, is_repeated=True):
+            if tmp_profile in i.participant_list:
+                ls.append(i)
+        return ls
 
 
 class UserActiveFormsListView(ListAPIView):
