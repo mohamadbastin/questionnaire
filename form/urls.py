@@ -54,7 +54,7 @@ urlpatterns = [
     path('form/is-filled/<int:fid>', IsFormFilledByUserView.as_view()),
     path('form/my-answer/<int:formid>', MyAnsweredFormView.as_view()),
     path('register/', Register.as_view()),
-    path('participate/', Participate.as_view())
+    path('participate/<int:fid>', Participate.as_view())
 ]
 
 if settings.DEBUG:
