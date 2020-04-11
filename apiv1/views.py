@@ -1,5 +1,4 @@
 # Create your views here.
-from random import randint
 
 from kavenegar import *
 from rest_framework import status
@@ -139,7 +138,7 @@ class MyAnsweredFormsListView(ListAPIView):
     def get_queryset(self):
         tmp_user = self.request.user
         tmp_profile = Profile.objects.get(user=tmp_user)
-        return Form.objects.filter(answered_form__participant=tmp_profile, is_repeated=True)
+        return Form.objects.filter(participant_list__in=[tmp_profile], is_repeated=True)
 
 
 class UserActiveFormsListView(ListAPIView):
