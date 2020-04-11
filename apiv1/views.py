@@ -141,7 +141,7 @@ class MyAnsweredFormsListView(ListAPIView):
         ls = []
         for i in Form.objects.filter(is_active=True, is_repeated=True):
             print(i.participant_list)
-            if tmp_profile in i.participant_list:
+            if tmp_profile in i.participant_list.all():
                 ls.append(i)
         return ls
 
