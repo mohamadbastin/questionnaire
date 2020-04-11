@@ -38,7 +38,7 @@ class Form(models.Model):
     duration_days = models.IntegerField(null=True)
     password = models.CharField(max_length=256, null=True, blank=True)
     is_active = models.BooleanField(default=True)
-    participant_list = models.ManyToManyField(Profile, related_name='formm')
+    participant_list = models.ManyToManyField(Profile, related_name='formm', null=True, blank=True)
 
     def __str__(self):
         return str(self.name) + " " + str(self.author)
