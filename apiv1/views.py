@@ -156,6 +156,18 @@ class UserActiveFormsListView(ListAPIView):
         return profile.formm.filter(is_repeated=True, is_active=True)
 
 
+class RemoveParticipate(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChoiceSerializer
+
+    def post(self, request, *args, **kwargs):
+        pr = Profile.objects.get(user=self.request.user)
+        frm = Form.objects.get(id=kwargs.get('fid'))
+        frm.participant_list.remove(pr)
+        frm.save()
+        return Response({"msg": "ok"}, status=status.HTTP_200_OK)
+
+
 class Participate(CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ChoiceSerializer
