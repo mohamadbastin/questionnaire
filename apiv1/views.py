@@ -360,7 +360,7 @@ class FormAnswerCreate(CreateAPIView):
 
     # [
     #     {
-    #         question
+    #         question: int
     #
     #         //text
     #         text
@@ -639,3 +639,19 @@ class Register(CreateAPIView):
             b = Profile.objects.create(user=a, name=name)
 
         return Response({"msg": "ok"}, status=status.HTTP_200_OK)
+
+
+class ReportByQuestion(ListAPIView):
+    serializer_class = AnswerSerializer
+
+    def get_queryset(self):
+        ppid = self.request.data.get('ppid')
+        date = self.request.data.get('date')
+        qid = self.kwargs.get('qid')
+        a = Answer.objects.filter(question=Question.objects.get(pk=qid))
+        if ppid != 0:
+            a.filter(answered_form__participant=Profile.objects.get(pk=ppid))
+        if date != 0:
+            print(date)
+
+        return a
