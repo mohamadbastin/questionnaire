@@ -102,8 +102,9 @@ class FormQuestionListView(ListAPIView):
     serializer_class = MyQuestionSerializer
 
     def get_queryset(self):
+        f = Form.objects.get(id=self.kwargs.get('form'))
         ls = []
-        for i in Question.objects.all():
+        for i in Question.objects.filter(form=f):
             if i.type == "text":
                 ls.append(TextQuestion.objects.get(id=i.id))
             elif i.type == "range":
