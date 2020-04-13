@@ -208,7 +208,7 @@ class FormParticipantListView(ListAPIView):
 
     def get_queryset(self):
         formid = self.kwargs.get("formid")
-        return Profile.objects.filter(answered_form__form=formid)
+        return Profile.objects.filter(answered_form__form=formid).distinct()
 
 
 class ParticipantAnsweredFormView(ListAPIView):
