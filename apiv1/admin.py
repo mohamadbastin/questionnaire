@@ -8,6 +8,10 @@ class FormAdmin(admin.ModelAdmin):
     list_display = ['name', 'author']
 
 
+# class AnswerFormAdmin(admin.ModelAdmin):
+    # list_display = ['name', 'author']
+
+
 admin.site.register(Profile)
 admin.site.register(Message)
 admin.site.register(Operator)
