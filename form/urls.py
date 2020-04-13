@@ -34,7 +34,7 @@ urlpatterns = [
     path('form/questions/<int:form>', FormQuestionListView.as_view()),
     # path('user/forms/<int:user>', CreatedFormListView.as_view()),
     path('user/created-forms/', MyCreatedFormListView.as_view()),
-    # path('answered-form/', MyAnsweredFormsListView.as_view()),
+    path('answered-form/', MyAnsweredFormsListView.as_view()),
     path('form/participants/<int:formid>', FormParticipantListView.as_view()),
     path('form/participant/answered-form/<int:formid>/<int:ppid>', ParticipantAnsweredFormView.as_view()),
     # path('request/<int:formid>', SendRequestView.as_view()),
