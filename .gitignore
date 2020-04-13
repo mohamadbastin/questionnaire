@@ -7,3 +7,5 @@ myenv
 static
 db.sqlite3
 apiv1/migrations
+form/__pycache__/
+apiv1/__pycache__/_
