@@ -266,6 +266,11 @@ class FormCreateView(CreateAPIView):
         f.duration_days = None
         f.save()
 
+
+        if f.is_private:
+            f.password = self.request.data.get('password')
+            f.save()
+
         try:
             a = request.data.get('times')
             for i in a:
