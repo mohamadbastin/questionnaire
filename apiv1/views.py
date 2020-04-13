@@ -211,13 +211,22 @@ class FormParticipantListView(ListAPIView):
         return Profile.objects.filter(answered_form__form=formid).distinct()
 
 
-class ParticipantAnsweredFormView(ListAPIView):
+class ParticipantAnsweredFormView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AnsweredFormSerializer
 
     def get_queryset(self):
+        # 2020 - 04 - 13
+        date = self.request.data.get('date')
         formid = self.kwargs.get("formid")
         participant = self.kwargs.get("ppid")
+
+        if date != 0 or date != "0":
+            year = int(date[0, 4])
+            month = int(date[5, 7])
+            day = int(date[8, ])
+            return AnsweredForm.objects.filter(form=formid, participant=participant, date__year=year, date__month=month,
+                                               date__day=day).order_by("-date")
 
         return AnsweredForm.objects.filter(form=formid, participant=participant).order_by("-date")
 
@@ -265,7 +274,6 @@ class FormCreateView(CreateAPIView):
         # else:
         f.duration_days = None
         f.save()
-
 
         if f.is_private:
             f.password = self.request.data.get('password')
