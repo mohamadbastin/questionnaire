@@ -227,9 +227,9 @@ class ParticipantAnsweredFormView(ListAPIView):
         print(date)
         if date:
             if date != 0 or date != "0":
-                year = int(date[0, 4])
-                month = int(date[5, 7])
-                day = int(date[8,])
+                year = int(date[0:4])
+                month = int(date[5:7])
+                day = int(date[8:])
 
                 return AnsweredForm.objects.filter(form=formid, participant=participant, date__year=year,
                                                    date__month=month,
