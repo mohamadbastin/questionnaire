@@ -226,7 +226,7 @@ class ParticipantAnsweredFormView(ListAPIView):
         participant = self.kwargs.get("ppid")
         print(date)
         if date:
-            if date != 0 or date != "0":
+            if date != "all":
                 year = int(date[0:4])
                 month = int(date[5:7])
                 day = int(date[8:])
