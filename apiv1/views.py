@@ -222,7 +222,7 @@ class FormAnsweredFormsListView(ListAPIView):
     def get_queryset(self):
         # 2020 - 04 - 13
         date = self.request.data.get('date', None)
-        formid = self.kwargs.get("formid")
+        formid = self.kwargs.get("fid")
         # participant = self.kwargs.get("ppid")
         print(date)
         if date:
