@@ -211,9 +211,10 @@ class FormParticipantListView(ListAPIView):
         return Profile.objects.filter(answered_form__form=formid).distinct()
 
 
-class ParticipantAnsweredFormView(CreateAPIView):
+class ParticipantAnsweredFormView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AnsweredFormSerializer
+    allowed_methods=['GET', 'POST']
 
     def get_queryset(self):
         # 2020 - 04 - 13
