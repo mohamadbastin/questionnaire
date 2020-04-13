@@ -46,7 +46,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = "__all__"
+        fields = ['pk', 'answered_form', 'question', 'text', 'number', 'choice']
 
 
 class AnsweredFormSerializer(serializers.ModelSerializer):
