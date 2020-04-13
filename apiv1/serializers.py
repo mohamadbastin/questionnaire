@@ -33,6 +33,14 @@ class RequestSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ChoiceSerializer(serializers.ModelSerializer):
+    # question = ChoiceQuestionSerializer()
+
+    class Meta:
+        model = Choice
+        fields = ["id", "text"]
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     # form = FormSerializer()
 
@@ -43,6 +51,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class AnswerSerializer(serializers.ModelSerializer):
     question = QuestionSerializer()
+    choice = ChoiceSerializer(many=True)
 
     class Meta:
         model = Answer
@@ -71,12 +80,7 @@ class RangeQuestionSerializer(QuestionSerializer):
         fields = "__all__"
 
 
-class ChoiceSerializer(serializers.ModelSerializer):
-    # question = ChoiceQuestionSerializer()
 
-    class Meta:
-        model = Choice
-        fields = ["id", "text"]
 
 
 class ChoiceQuestionSerializer(QuestionSerializer):
