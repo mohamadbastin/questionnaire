@@ -69,7 +69,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
 class AnsweredFormSerializer(serializers.ModelSerializer):
     # form = FormSerializer()
-    # participant = ProfileSerializer()
+    participant = ProfileSerializer()
     answer = AnswerSerializer(many=True)
 
     class Meta:
