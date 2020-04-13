@@ -3,7 +3,7 @@
 from kavenegar import *
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -211,10 +211,10 @@ class FormParticipantListView(ListAPIView):
         return Profile.objects.filter(answered_form__form=formid).distinct()
 
 
-class ParticipantAnsweredFormView(ListAPIView):
+class ParticipantAnsweredFormView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AnsweredFormSerializer
-    allowed_methods=['GET', 'POST']
+    # allowed_methods = ['GET', 'POST']
 
     def get_queryset(self):
         # 2020 - 04 - 13
@@ -225,7 +225,7 @@ class ParticipantAnsweredFormView(ListAPIView):
         if date != 0 or date != "0":
             year = int(date[0, 4])
             month = int(date[5, 7])
-            day = int(date[8, ])
+            day = int(date[8,])
             return AnsweredForm.objects.filter(form=formid, participant=participant, date__year=year, date__month=month,
                                                date__day=day).order_by("-date")
 
