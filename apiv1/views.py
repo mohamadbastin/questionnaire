@@ -216,6 +216,8 @@ class ParticipantAnsweredFormView(ListCreateAPIView):
     serializer_class = AnsweredFormSerializer
 
     # allowed_methods = ['GET', 'POST']
+    def post(self, request, *args, **kwargs):
+        pass
 
     def get_queryset(self):
         # 2020 - 04 - 13
