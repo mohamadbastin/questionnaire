@@ -20,7 +20,7 @@ ipython-genutils==0.2.0
 jedi==0.15.1
 kavenegar==1.1.2
 multidict==4.7.5
-numpy==1.18.2
+numpy==1.22.0
 orderedmultidict==1.0.1
 pandas==1.0.3
 parso==0.5.1
